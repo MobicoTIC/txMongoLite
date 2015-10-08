@@ -12,15 +12,18 @@ from .database import Database
 
 class Connection(ConnectionPool):
     def __init__(self, *args, **kargs):
+        print('connecting')
         self._databases = {}
         self._registered_documents = {}
         super(ConnectionPool, self).__init__(*args, **kargs)
+        print('connected')
 
     def register(self, obj_list):
         for obj in obj_list:
             self._registered_documents[obj.__name__] = obj
 
     def __getattr__(self, key):
+        print('getting')
         if key in self._registered_documents:
             document = self._registered_documents[key]
             try:
@@ -33,6 +36,11 @@ class Connection(ConnectionPool):
                                      "attribute without the `__collection__` "
                                      "attribute".format(key))
         else:
+            print('checking', key)
             if key not in self._databases:
                 self._databases[key] = Database(self, key)
             return self._databases[key]
+
+    def __getitem__(self, key):
+        print('getting items in database!!')
+        return getattr(self, key)
