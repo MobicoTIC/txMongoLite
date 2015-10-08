@@ -5,5 +5,5 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
-from connection import Connection
-from document import Document
+from .connection import Connection
+from .document import Document
