@@ -14,23 +14,23 @@ from txmongolite import Connection, Document
 
 #pylint: disable=missing-docstring
 class TestApi(unittest.TestCase):
+    @defer.inlineCallbacks
     def setUp(self):
-        print('creating')
-        self.connection = Connection()
-        print('getting subattributes')
-        print(type(self.connection['txmltest']))
+        self.connection = yield Connection()
+        yield self.connection.txmltest.drop_collection('txmongolite')
         self.col = self.connection['txmltest']['txmongolite']
         self.col.insert({'test': 'value'})
 
+    @defer.inlineCallbacks
     def tearDown(self):
-        pass
+        yield self.connection.txmltest.drop_collection('txmongolite')
+        yield self.connection.disconnect()
 
     @defer.inlineCallbacks
     def test_aggregate(self):
         class TestDoc(Document):
             pass
         self.connection.register([TestDoc])
-        print('before TestDoc')
         testdoc = self.col.TestDoc()
         resp = list((yield testdoc.aggregate([{"$match": {"test": "value"}}])))
         self.assertEqual(len(resp), 1)

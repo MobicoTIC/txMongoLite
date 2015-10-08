@@ -15,8 +15,8 @@ class Collection(Collection):
         self._registered_documents = self.database.connection._registered_documents
 
     def __getattr__(self, key):
-        if key not in self._registered_documents:
-            if not key in self._documents:
+        if key in self._registered_documents:
+            if key not in self._documents:
                 self._documents[key] = self._registered_documents[key](
                     collection=self)
             return self._documents[key]
@@ -24,7 +24,7 @@ class Collection(Collection):
             newkey = u"{}.{}".format(self.name, key)
             if newkey not in self._collections:
                 self._collections[newkey] = Collection(self.database, newkey)
+            return self._collections[newkey]
 
     def __getitem__(self, key):
-        print('getting items for collection!!')
         return getattr(self, key)

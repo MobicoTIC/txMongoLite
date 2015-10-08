@@ -10,20 +10,31 @@ from txmongo.connection import ConnectionPool
 from .database import Database
 
 
+class CallableMixin(object):
+    def __call__(self, doc=None, gen_skel=True):
+        return self._obj_class(
+            doc=doc,
+            gen_skel=gen_skel,
+            collection=self.collection)
+
+
 class Connection(ConnectionPool):
     def __init__(self, *args, **kargs):
-        print('connecting')
         self._databases = {}
         self._registered_documents = {}
-        super(ConnectionPool, self).__init__(*args, **kargs)
-        print('connected')
+        super(Connection, self).__init__(*args, **kargs)
 
     def register(self, obj_list):
         for obj in obj_list:
-            self._registered_documents[obj.__name__] = obj
+            CallableDocument = type(
+                str("Callable{}".format(obj.__name__)),
+                (obj, CallableMixin),
+                {"_obj_class": obj,
+                 "__repr__": object.__repr__}
+            )
+            self._registered_documents[obj.__name__] = CallableDocument
 
     def __getattr__(self, key):
-        print('getting')
         if key in self._registered_documents:
             document = self._registered_documents[key]
             try:
@@ -36,11 +47,9 @@ class Connection(ConnectionPool):
                                      "attribute without the `__collection__` "
                                      "attribute".format(key))
         else:
-            print('checking', key)
             if key not in self._databases:
                 self._databases[key] = Database(self, key)
             return self._databases[key]
 
     def __getitem__(self, key):
-        print('getting items in database!!')
         return getattr(self, key)
