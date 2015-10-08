@@ -23,7 +23,7 @@ classifiers = [
     "Programming Language :: Python :: 2.7",
 ]
 
-with open('README.rst') as f:
+with open('README.md') as f:
     readme = f.read()
 
 setup(
@@ -33,7 +33,6 @@ setup(
     install_requires=[
         "txmongo",
     ],
-    package_data={"txmongolite": ["_version"]},
     author="Mobico TIC SAS",
     author_email="desarrollo@mobicotic.com",
     classifiers=classifiers,
