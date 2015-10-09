@@ -18,6 +18,9 @@ class CallableMixin(object):
             collection=self.collection)
 
 
+_iterables = (list, tuple, set, frozenset)
+
+
 class Connection(ConnectionPool):
     def __init__(self, *args, **kargs):
         self._databases = {}
@@ -25,6 +28,10 @@ class Connection(ConnectionPool):
         super(Connection, self).__init__(*args, **kargs)
 
     def register(self, obj_list):
+        decorator = None
+        if not isinstance(obj_list, _iterables):
+            decorator = obj_list
+            obj_list = [obj_list]
         for obj in obj_list:
             CallableDocument = type(
                 str("Callable{}".format(obj.__name__)),
@@ -33,6 +40,9 @@ class Connection(ConnectionPool):
                  "__repr__": object.__repr__}
             )
             self._registered_documents[obj.__name__] = CallableDocument
+
+        if decorator is not None:
+            return decorator
 
     def __getattr__(self, key):
         if key in self._registered_documents:
