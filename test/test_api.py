@@ -34,3 +34,14 @@ class TestApi(unittest.TestCase):
         testdoc = self.col.TestDoc()
         resp = list((yield testdoc.aggregate([{"$match": {"test": "value"}}])))
         self.assertEqual(len(resp), 1)
+
+    @defer.inlineCallbacks
+    def test_aggregate_with_decorator(self):
+        """Test using the register as a decorator."""
+        @self.connection.register
+        class TestDoc(Document):
+            pass
+
+        testdoc = self.col.TestDoc()
+        resp = list((yield testdoc.aggregate([{"$match": {"test": "value"}}])))
+        self.assertEqual(len(resp), 1)
