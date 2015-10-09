@@ -27,13 +27,17 @@ class TestApi(unittest.TestCase):
         yield self.connection.disconnect()
 
     @defer.inlineCallbacks
+    def _test_aggregate(self):
+        testdoc = self.col.TestDoc()
+        resp = list((yield testdoc.aggregate([{"$match": {"test": "value"}}])))
+        self.assertEqual(len(resp), 1)
+
+    @defer.inlineCallbacks
     def test_aggregate(self):
         class TestDoc(Document):
             pass
         self.connection.register([TestDoc])
-        testdoc = self.col.TestDoc()
-        resp = list((yield testdoc.aggregate([{"$match": {"test": "value"}}])))
-        self.assertEqual(len(resp), 1)
+        yield self._test_aggregate()
 
     @defer.inlineCallbacks
     def test_aggregate_with_decorator(self):
@@ -41,7 +45,10 @@ class TestApi(unittest.TestCase):
         @self.connection.register
         class TestDoc(Document):
             pass
+        yield self._test_aggregate()
 
-        testdoc = self.col.TestDoc()
-        resp = list((yield testdoc.aggregate([{"$match": {"test": "value"}}])))
-        self.assertEqual(len(resp), 1)
+    def test_aggregate_with_custom_fields(self):
+        """Tests the document with custom values for the database and the
+        collection.
+
+        """
