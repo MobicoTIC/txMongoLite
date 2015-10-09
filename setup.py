@@ -9,10 +9,7 @@ from __future__ import unicode_literals
 from setuptools import find_packages, setup
 import os.path
 
-with open(os.path.join(
-        os.path.dirname(__file__),
-        "txmongolite", "_version")) as ver:
-    __version__ = ver.readline().strip()
+__version__ = "0.0.8"
 
 classifiers = [
     "Development Status :: 1 - Planning",
@@ -23,8 +20,7 @@ classifiers = [
     "Programming Language :: Python :: 2.7",
 ]
 
-with open('README.md') as f:
-    readme = f.read()
+readme = ''
 
 setup(
     name="txmongolite",
