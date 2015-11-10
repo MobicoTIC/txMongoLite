@@ -32,6 +32,8 @@ class Connection(ConnectionPool):
         if not isinstance(obj_list, _iterables):
             decorator = obj_list
             obj_list = [obj_list]
+
+        # register
         for obj in obj_list:
             CallableDocument = type(
                 str("Callable{}".format(obj.__name__)),
@@ -49,7 +51,7 @@ class Connection(ConnectionPool):
             document = self._registered_documents[key]
             try:
                 return getattr(self[document.__database__]
-                               [document.__colllection__],
+                               [document.__collection__],
                                key)
             except AttributeError:
                 raise AttributeError("{}: __collection__ attribute not found. "

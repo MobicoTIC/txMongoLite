@@ -47,8 +47,17 @@ class TestApi(unittest.TestCase):
             pass
         yield self._test_aggregate()
 
+    @defer.inlineCallbacks
     def test_aggregate_with_custom_fields(self):
         """Tests the document with custom values for the database and the
         collection.
 
         """
+        @self.connection.register
+        class TestDoc(Document):
+            __database__ = 'txmltest'
+            __collection__ = 'secondtxmongolite'
+
+        testdoc = self.connection.TestDoc()
+        resp = list((yield testdoc.aggregate([{"$match": {"test": "value"}}])))
+        self.assertEqual(len(resp), 0)
